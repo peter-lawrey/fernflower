@@ -22,28 +22,28 @@ import org.jetbrains.java.decompiler.modules.decompiler.ExprProcessor;
 
 public class RootStatement extends Statement {
 
-  private Statement dummyExit;
+    private Statement dummyExit;
 
-  public RootStatement(Statement head, Statement dummyExit) {
+    public RootStatement(Statement head, Statement dummyExit) {
 
-    type = Statement.TYPE_ROOT;
+        type = Statement.TYPE_ROOT;
 
-    first = head;
-    this.dummyExit = dummyExit;
+        first = head;
+        this.dummyExit = dummyExit;
 
-    stats.addWithKey(first, first.id);
-    first.setParent(this);
-  }
+        stats.addWithKey(first, first.id);
+        first.setParent(this);
+    }
 
-  public TextBuffer toJava(int indent, BytecodeMappingTracer tracer) {
-    return ExprProcessor.listToJava(varDefinitions, indent, tracer).append(first.toJava(indent, tracer));
-  }
+    public TextBuffer toJava(int indent, BytecodeMappingTracer tracer) {
+        return ExprProcessor.listToJava(varDefinitions, indent, tracer).append(first.toJava(indent, tracer));
+    }
 
-  public Statement getDummyExit() {
-    return dummyExit;
-  }
+    public Statement getDummyExit() {
+        return dummyExit;
+    }
 
-  public void setDummyExit(Statement dummyExit) {
-    this.dummyExit = dummyExit;
-  }
+    public void setDummyExit(Statement dummyExit) {
+        this.dummyExit = dummyExit;
+    }
 }

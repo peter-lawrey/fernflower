@@ -29,34 +29,34 @@ import java.util.List;
 
 public class MethodWrapper {
 
-  public RootStatement root;
+    public RootStatement root;
 
-  public VarProcessor varproc;
+    public VarProcessor varproc;
 
-  public StructMethod methodStruct;
+    public StructMethod methodStruct;
 
-  public CounterContainer counter;
+    public CounterContainer counter;
 
-  public DirectGraph graph;
+    public DirectGraph graph;
 
-  public List<VarVersionPair> signatureFields;
+    public List<VarVersionPair> signatureFields;
 
-  public boolean decompiledWithErrors;
+    public boolean decompiledWithErrors;
 
-  public HashSet<String> setOuterVarNames = new HashSet<String>();
+    public HashSet<String> setOuterVarNames = new HashSet<String>();
 
-  public MethodWrapper(RootStatement root, VarProcessor varproc, StructMethod methodStruct, CounterContainer counter) {
-    this.root = root;
-    this.varproc = varproc;
-    this.methodStruct = methodStruct;
-    this.counter = counter;
-  }
-
-  public DirectGraph getOrBuildGraph() {
-    if (graph == null && root != null) {
-      FlattenStatementsHelper flatthelper = new FlattenStatementsHelper();
-      graph = flatthelper.buildDirectGraph(root);
+    public MethodWrapper(RootStatement root, VarProcessor varproc, StructMethod methodStruct, CounterContainer counter) {
+        this.root = root;
+        this.varproc = varproc;
+        this.methodStruct = methodStruct;
+        this.counter = counter;
     }
-    return graph;
-  }
+
+    public DirectGraph getOrBuildGraph() {
+        if (graph == null && root != null) {
+            FlattenStatementsHelper flatthelper = new FlattenStatementsHelper();
+            graph = flatthelper.buildDirectGraph(root);
+        }
+        return graph;
+    }
 }

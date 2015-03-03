@@ -27,110 +27,109 @@ import java.util.List;
 
 public class DirectGraph {
 
-  public VBStyleCollection<DirectNode, String> nodes = new VBStyleCollection<DirectNode, String>();
+    public VBStyleCollection<DirectNode, String> nodes = new VBStyleCollection<DirectNode, String>();
 
-  public DirectNode first;
+    public DirectNode first;
 
-  // exit, [source, destination]
-  public HashMap<String, List<FinallyPathWrapper>> mapShortRangeFinallyPaths = new HashMap<String, List<FinallyPathWrapper>>();
+    // exit, [source, destination]
+    public HashMap<String, List<FinallyPathWrapper>> mapShortRangeFinallyPaths = new HashMap<String, List<FinallyPathWrapper>>();
 
-  // exit, [source, destination]
-  public HashMap<String, List<FinallyPathWrapper>> mapLongRangeFinallyPaths = new HashMap<String, List<FinallyPathWrapper>>();
+    // exit, [source, destination]
+    public HashMap<String, List<FinallyPathWrapper>> mapLongRangeFinallyPaths = new HashMap<String, List<FinallyPathWrapper>>();
 
-  // negative if branches (recorded for handling of && and ||)
-  public HashMap<String, String> mapNegIfBranch = new HashMap<String, String>();
+    // negative if branches (recorded for handling of && and ||)
+    public HashMap<String, String> mapNegIfBranch = new HashMap<String, String>();
 
-  // nodes, that are exception exits of a finally block with monitor variable
-  public HashMap<String, String> mapFinallyMonitorExceptionPathExits = new HashMap<String, String>();
+    // nodes, that are exception exits of a finally block with monitor variable
+    public HashMap<String, String> mapFinallyMonitorExceptionPathExits = new HashMap<String, String>();
 
-  public void sortReversePostOrder() {
-    LinkedList<DirectNode> res = new LinkedList<DirectNode>();
-    addToReversePostOrderListIterative(first, res);
+    private static void addToReversePostOrderListIterative(DirectNode root, List<DirectNode> lst) {
 
-    nodes.clear();
-    for (DirectNode node : res) {
-      nodes.addWithKey(node, node.id);
-    }
-  }
+        LinkedList<DirectNode> stackNode = new LinkedList<DirectNode>();
+        LinkedList<Integer> stackIndex = new LinkedList<Integer>();
 
-  private static void addToReversePostOrderListIterative(DirectNode root, List<DirectNode> lst) {
+        HashSet<DirectNode> setVisited = new HashSet<DirectNode>();
 
-    LinkedList<DirectNode> stackNode = new LinkedList<DirectNode>();
-    LinkedList<Integer> stackIndex = new LinkedList<Integer>();
+        stackNode.add(root);
+        stackIndex.add(0);
 
-    HashSet<DirectNode> setVisited = new HashSet<DirectNode>();
+        while (!stackNode.isEmpty()) {
 
-    stackNode.add(root);
-    stackIndex.add(0);
+            DirectNode node = stackNode.getLast();
+            int index = stackIndex.removeLast();
 
-    while (!stackNode.isEmpty()) {
+            setVisited.add(node);
 
-      DirectNode node = stackNode.getLast();
-      int index = stackIndex.removeLast();
+            for (; index < node.succs.size(); index++) {
+                DirectNode succ = node.succs.get(index);
 
-      setVisited.add(node);
+                if (!setVisited.contains(succ)) {
+                    stackIndex.add(index + 1);
 
-      for (; index < node.succs.size(); index++) {
-        DirectNode succ = node.succs.get(index);
+                    stackNode.add(succ);
+                    stackIndex.add(0);
 
-        if (!setVisited.contains(succ)) {
-          stackIndex.add(index + 1);
+                    break;
+                }
+            }
 
-          stackNode.add(succ);
-          stackIndex.add(0);
+            if (index == node.succs.size()) {
+                lst.add(0, node);
 
-          break;
+                stackNode.removeLast();
+            }
         }
-      }
-
-      if (index == node.succs.size()) {
-        lst.add(0, node);
-
-        stackNode.removeLast();
-      }
-    }
-  }
-
-
-  public boolean iterateExprents(ExprentIterator iter) {
-
-    LinkedList<DirectNode> stack = new LinkedList<DirectNode>();
-    stack.add(first);
-
-    HashSet<DirectNode> setVisited = new HashSet<DirectNode>();
-
-    while (!stack.isEmpty()) {
-
-      DirectNode node = stack.removeFirst();
-
-      if (setVisited.contains(node)) {
-        continue;
-      }
-      setVisited.add(node);
-
-      for (int i = 0; i < node.exprents.size(); i++) {
-        int res = iter.processExprent(node.exprents.get(i));
-
-        if (res == 1) {
-          return false;
-        }
-
-        if (res == 2) {
-          node.exprents.remove(i);
-          i--;
-        }
-      }
-
-      stack.addAll(node.succs);
     }
 
-    return true;
-  }
+    public void sortReversePostOrder() {
+        LinkedList<DirectNode> res = new LinkedList<DirectNode>();
+        addToReversePostOrderListIterative(first, res);
 
-  public interface ExprentIterator {
-    // 0 - success, do nothing
-    // 1 - cancel iteration
-    // 2 - success, delete exprent
-    int processExprent(Exprent exprent);
-  }
+        nodes.clear();
+        for (DirectNode node : res) {
+            nodes.addWithKey(node, node.id);
+        }
+    }
+
+    public boolean iterateExprents(ExprentIterator iter) {
+
+        LinkedList<DirectNode> stack = new LinkedList<DirectNode>();
+        stack.add(first);
+
+        HashSet<DirectNode> setVisited = new HashSet<DirectNode>();
+
+        while (!stack.isEmpty()) {
+
+            DirectNode node = stack.removeFirst();
+
+            if (setVisited.contains(node)) {
+                continue;
+            }
+            setVisited.add(node);
+
+            for (int i = 0; i < node.exprents.size(); i++) {
+                int res = iter.processExprent(node.exprents.get(i));
+
+                if (res == 1) {
+                    return false;
+                }
+
+                if (res == 2) {
+                    node.exprents.remove(i);
+                    i--;
+                }
+            }
+
+            stack.addAll(node.succs);
+        }
+
+        return true;
+    }
+
+    public interface ExprentIterator {
+        // 0 - success, do nothing
+        // 1 - cancel iteration
+        // 2 - success, delete exprent
+        int processExprent(Exprent exprent);
+    }
 }

@@ -28,127 +28,127 @@ import java.util.List;
 
 public class SynchronizedStatement extends Statement {
 
-  private Statement body;
+    private Statement body;
 
-  private List<Exprent> headexprent = new ArrayList<Exprent>();
+    private List<Exprent> headexprent = new ArrayList<Exprent>();
 
-  // *****************************************************************************
-  // constructors
-  // *****************************************************************************
+    // *****************************************************************************
+    // constructors
+    // *****************************************************************************
 
-  public SynchronizedStatement() {
-    type = TYPE_SYNCRONIZED;
+    public SynchronizedStatement() {
+        type = TYPE_SYNCRONIZED;
 
-    headexprent.add(null);
-  }
-
-  public SynchronizedStatement(Statement head, Statement body, Statement exc) {
-
-    this();
-
-    first = head;
-    stats.addWithKey(head, head.id);
-
-    this.body = body;
-    stats.addWithKey(body, body.id);
-
-    stats.addWithKey(exc, exc.id);
-
-    List<StatEdge> lstSuccs = body.getSuccessorEdges(STATEDGE_DIRECT_ALL);
-    if (!lstSuccs.isEmpty()) {
-      StatEdge edge = lstSuccs.get(0);
-      if (edge.getType() == StatEdge.TYPE_REGULAR) {
-        post = edge.getDestination();
-      }
-    }
-  }
-
-
-  // *****************************************************************************
-  // public methods
-  // *****************************************************************************
-
-  public TextBuffer toJava(int indent, BytecodeMappingTracer tracer) {
-    TextBuffer buf = new TextBuffer();
-    buf.append(ExprProcessor.listToJava(varDefinitions, indent, tracer));
-    buf.append(first.toJava(indent, tracer));
-
-    if (isLabeled()) {
-      buf.appendIndent(indent).append("label").append(this.id.toString()).append(":").appendLineSeparator();
-      tracer.incrementCurrentSourceLine();
+        headexprent.add(null);
     }
 
-    buf.appendIndent(indent).append(headexprent.get(0).toJava(indent, tracer)).append(" {").appendLineSeparator();
-    tracer.incrementCurrentSourceLine();
+    public SynchronizedStatement(Statement head, Statement body, Statement exc) {
 
-    buf.append(ExprProcessor.jmpWrapper(body, indent + 1, true, tracer));
+        this();
 
-    buf.appendIndent(indent).append("}").appendLineSeparator();
-    tracer.incrementCurrentSourceLine();
+        first = head;
+        stats.addWithKey(head, head.id);
 
-    return buf;
-  }
+        this.body = body;
+        stats.addWithKey(body, body.id);
 
-  public void initExprents() {
-    headexprent.set(0, first.getExprents().remove(first.getExprents().size() - 1));
-  }
+        stats.addWithKey(exc, exc.id);
 
-  public List<Object> getSequentialObjects() {
-
-    List<Object> lst = new ArrayList<Object>(stats);
-    lst.add(1, headexprent.get(0));
-
-    return lst;
-  }
-
-  public void replaceExprent(Exprent oldexpr, Exprent newexpr) {
-    if (headexprent.get(0) == oldexpr) {
-      headexprent.set(0, newexpr);
-    }
-  }
-
-  public void replaceStatement(Statement oldstat, Statement newstat) {
-
-    if (body == oldstat) {
-      body = newstat;
+        List<StatEdge> lstSuccs = body.getSuccessorEdges(STATEDGE_DIRECT_ALL);
+        if (!lstSuccs.isEmpty()) {
+            StatEdge edge = lstSuccs.get(0);
+            if (edge.getType() == StatEdge.TYPE_REGULAR) {
+                post = edge.getDestination();
+            }
+        }
     }
 
-    super.replaceStatement(oldstat, newstat);
-  }
 
-  public void removeExc() {
-    Statement exc = stats.get(2);
-    SequenceHelper.destroyStatementContent(exc, true);
+    // *****************************************************************************
+    // public methods
+    // *****************************************************************************
 
-    stats.removeWithKey(exc.id);
-  }
+    public TextBuffer toJava(int indent, BytecodeMappingTracer tracer) {
+        TextBuffer buf = new TextBuffer();
+        buf.append(ExprProcessor.listToJava(varDefinitions, indent, tracer));
+        buf.append(first.toJava(indent, tracer));
 
-  public Statement getSimpleCopy() {
-    return new SynchronizedStatement();
-  }
+        if (isLabeled()) {
+            buf.appendIndent(indent).append("label").append(this.id.toString()).append(":").appendLineSeparator();
+            tracer.incrementCurrentSourceLine();
+        }
 
-  public void initSimpleCopy() {
-    first = stats.get(0);
-    body = stats.get(1);
-  }
+        buf.appendIndent(indent).append(headexprent.get(0).toJava(indent, tracer)).append(" {").appendLineSeparator();
+        tracer.incrementCurrentSourceLine();
 
-  // *****************************************************************************
-  // getter and setter methods
-  // *****************************************************************************
+        buf.append(ExprProcessor.jmpWrapper(body, indent + 1, true, tracer));
 
-  public Statement getBody() {
-    return body;
-  }
+        buf.appendIndent(indent).append("}").appendLineSeparator();
+        tracer.incrementCurrentSourceLine();
 
-  public void setBody(Statement body) {
-    this.body = body;
-  }
+        return buf;
+    }
 
-  public List<Exprent> getHeadexprentList() {
-    return headexprent;
-  }
+    public void initExprents() {
+        headexprent.set(0, first.getExprents().remove(first.getExprents().size() - 1));
+    }
 
-  public Exprent getHeadexprent() {
-    return headexprent.get(0);
-  }
+    public List<Object> getSequentialObjects() {
+
+        List<Object> lst = new ArrayList<Object>(stats);
+        lst.add(1, headexprent.get(0));
+
+        return lst;
+    }
+
+    public void replaceExprent(Exprent oldexpr, Exprent newexpr) {
+        if (headexprent.get(0) == oldexpr) {
+            headexprent.set(0, newexpr);
+        }
+    }
+
+    public void replaceStatement(Statement oldstat, Statement newstat) {
+
+        if (body == oldstat) {
+            body = newstat;
+        }
+
+        super.replaceStatement(oldstat, newstat);
+    }
+
+    public void removeExc() {
+        Statement exc = stats.get(2);
+        SequenceHelper.destroyStatementContent(exc, true);
+
+        stats.removeWithKey(exc.id);
+    }
+
+    public Statement getSimpleCopy() {
+        return new SynchronizedStatement();
+    }
+
+    public void initSimpleCopy() {
+        first = stats.get(0);
+        body = stats.get(1);
+    }
+
+    // *****************************************************************************
+    // getter and setter methods
+    // *****************************************************************************
+
+    public Statement getBody() {
+        return body;
+    }
+
+    public void setBody(Statement body) {
+        this.body = body;
+    }
+
+    public List<Exprent> getHeadexprentList() {
+        return headexprent;
+    }
+
+    public Exprent getHeadexprent() {
+        return headexprent.get(0);
+    }
 }

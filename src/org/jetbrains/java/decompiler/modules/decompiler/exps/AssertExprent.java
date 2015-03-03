@@ -22,33 +22,32 @@ import java.util.List;
 
 public class AssertExprent extends Exprent {
 
-  private final List<Exprent> parameters;
+    private final List<Exprent> parameters;
 
-  public AssertExprent(List<Exprent> parameters) {
-    super(EXPRENT_ASSERT);
-    this.parameters = parameters;
-  }
-
-  @Override
-  public TextBuffer toJava(int indent, BytecodeMappingTracer tracer) {
-    TextBuffer buffer = new TextBuffer();
-
-    buffer.append("assert ");
-
-    tracer.addMapping(bytecode);
-
-    if (parameters.get(0) == null) {
-      buffer.append("false");
-    }
-    else {
-      buffer.append(parameters.get(0).toJava(indent, tracer));
+    public AssertExprent(List<Exprent> parameters) {
+        super(EXPRENT_ASSERT);
+        this.parameters = parameters;
     }
 
-    if (parameters.size() > 1) {
-      buffer.append(" : ");
-      buffer.append(parameters.get(1).toJava(indent, tracer));
-    }
+    @Override
+    public TextBuffer toJava(int indent, BytecodeMappingTracer tracer) {
+        TextBuffer buffer = new TextBuffer();
 
-    return buffer;
-  }
+        buffer.append("assert ");
+
+        tracer.addMapping(bytecode);
+
+        if (parameters.get(0) == null) {
+            buffer.append("false");
+        } else {
+            buffer.append(parameters.get(0).toJava(indent, tracer));
+        }
+
+        if (parameters.size() > 1) {
+            buffer.append(" : ");
+            buffer.append(parameters.get(1).toJava(indent, tracer));
+        }
+
+        return buffer;
+    }
 }

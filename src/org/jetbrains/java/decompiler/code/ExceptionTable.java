@@ -23,36 +23,36 @@ import java.util.List;
 
 public class ExceptionTable {
 
-  private List<ExceptionHandler> handlers = new ArrayList<ExceptionHandler>();
+    private List<ExceptionHandler> handlers = new ArrayList<ExceptionHandler>();
 
-  public ExceptionTable() {
-  }
-
-  public ExceptionTable(List<ExceptionHandler> handlers) {
-    this.handlers = handlers;
-  }
-
-
-  public ExceptionHandler getHandlerByClass(StructContext context, int line, String valclass, boolean withany) {
-
-    ExceptionHandler res = null; // no handler found
-
-    for (ExceptionHandler handler : handlers) {
-      if (handler.from <= line && handler.to > line) {
-        String name = handler.exceptionClass;
-
-        if ((withany && name == null) ||   // any -> finally or synchronized handler
-            (name != null && Util.instanceOf(context, valclass, name))) {
-          res = handler;
-          break;
-        }
-      }
+    public ExceptionTable() {
     }
 
-    return res;
-  }
+    public ExceptionTable(List<ExceptionHandler> handlers) {
+        this.handlers = handlers;
+    }
 
-  public List<ExceptionHandler> getHandlers() {
-    return handlers;
-  }
+
+    public ExceptionHandler getHandlerByClass(StructContext context, int line, String valclass, boolean withany) {
+
+        ExceptionHandler res = null; // no handler found
+
+        for (ExceptionHandler handler : handlers) {
+            if (handler.from <= line && handler.to > line) {
+                String name = handler.exceptionClass;
+
+                if ((withany && name == null) ||   // any -> finally or synchronized handler
+                        (name != null && Util.instanceOf(context, valclass, name))) {
+                    res = handler;
+                    break;
+                }
+            }
+        }
+
+        return res;
+    }
+
+    public List<ExceptionHandler> getHandlers() {
+        return handlers;
+    }
 }

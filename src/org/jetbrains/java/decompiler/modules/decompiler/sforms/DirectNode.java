@@ -25,43 +25,43 @@ import java.util.List;
 
 public class DirectNode {
 
-  public static final int NODE_DIRECT = 1;
-  public static final int NODE_TAIL = 2;
-  public static final int NODE_INIT = 3;
-  public static final int NODE_CONDITION = 4;
-  public static final int NODE_INCREMENT = 5;
-  public static final int NODE_TRY = 6;
+    public static final int NODE_DIRECT = 1;
+    public static final int NODE_TAIL = 2;
+    public static final int NODE_INIT = 3;
+    public static final int NODE_CONDITION = 4;
+    public static final int NODE_INCREMENT = 5;
+    public static final int NODE_TRY = 6;
 
-  public int type;
+    public int type;
 
-  public String id;
+    public String id;
 
-  public BasicBlockStatement block;
+    public BasicBlockStatement block;
 
-  public Statement statement;
+    public Statement statement;
 
-  public List<Exprent> exprents = new ArrayList<Exprent>();
+    public List<Exprent> exprents = new ArrayList<Exprent>();
 
-  public List<DirectNode> succs = new ArrayList<DirectNode>();
+    public List<DirectNode> succs = new ArrayList<DirectNode>();
 
-  public List<DirectNode> preds = new ArrayList<DirectNode>();
+    public List<DirectNode> preds = new ArrayList<DirectNode>();
 
-  public DirectNode(int type, Statement statement, String id) {
-    this.type = type;
-    this.statement = statement;
-    this.id = id;
-  }
+    public DirectNode(int type, Statement statement, String id) {
+        this.type = type;
+        this.statement = statement;
+        this.id = id;
+    }
 
-  public DirectNode(int type, Statement statement, BasicBlockStatement block) {
-    this.type = type;
-    this.statement = statement;
+    public DirectNode(int type, Statement statement, BasicBlockStatement block) {
+        this.type = type;
+        this.statement = statement;
 
-    this.id = block.id.toString();
-    this.block = block;
-  }
+        this.id = block.id.toString();
+        this.block = block;
+    }
 
-  @Override
-  public String toString() {
-    return id;
-  }
+    @Override
+    public String toString() {
+        return id;
+    }
 }

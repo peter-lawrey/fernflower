@@ -27,71 +27,70 @@ import org.jetbrains.java.decompiler.modules.decompiler.ExprProcessor;
 
 public class BasicBlockStatement extends Statement {
 
-  // *****************************************************************************
-  // private fields
-  // *****************************************************************************
+    // *****************************************************************************
+    // private fields
+    // *****************************************************************************
 
-  private BasicBlock block;
+    private BasicBlock block;
 
-  // *****************************************************************************
-  // constructors
-  // *****************************************************************************
+    // *****************************************************************************
+    // constructors
+    // *****************************************************************************
 
-  public BasicBlockStatement(BasicBlock block) {
+    public BasicBlockStatement(BasicBlock block) {
 
-    type = Statement.TYPE_BASICBLOCK;
+        type = Statement.TYPE_BASICBLOCK;
 
-    this.block = block;
+        this.block = block;
 
-    id = block.id;
-    CounterContainer coun = DecompilerContext.getCounterContainer();
-    if (id >= coun.getCounter(CounterContainer.STATEMENT_COUNTER)) {
-      coun.setCounter(CounterContainer.STATEMENT_COUNTER, id + 1);
+        id = block.id;
+        CounterContainer coun = DecompilerContext.getCounterContainer();
+        if (id >= coun.getCounter(CounterContainer.STATEMENT_COUNTER)) {
+            coun.setCounter(CounterContainer.STATEMENT_COUNTER, id + 1);
+        }
+
+        Instruction instr = block.getLastInstruction();
+        if (instr != null) {
+            if (instr.group == CodeConstants.GROUP_JUMP && instr.opcode != CodeConstants.opc_goto) {
+                lastBasicType = LASTBASICTYPE_IF;
+            } else if (instr.group == CodeConstants.GROUP_SWITCH) {
+                lastBasicType = LASTBASICTYPE_SWITCH;
+            }
+        }
+
+        // monitorenter and monitorexits
+        buildMonitorFlags();
     }
 
-    Instruction instr = block.getLastInstruction();
-    if (instr != null) {
-      if (instr.group == CodeConstants.GROUP_JUMP && instr.opcode != CodeConstants.opc_goto) {
-        lastBasicType = LASTBASICTYPE_IF;
-      }
-      else if (instr.group == CodeConstants.GROUP_SWITCH) {
-        lastBasicType = LASTBASICTYPE_SWITCH;
-      }
+    // *****************************************************************************
+    // public methods
+    // *****************************************************************************
+
+    public TextBuffer toJava(int indent, BytecodeMappingTracer tracer) {
+        return ExprProcessor.listToJava(varDefinitions, indent, tracer).append(ExprProcessor.listToJava(exprents, indent, tracer));
     }
 
-    // monitorenter and monitorexits
-    buildMonitorFlags();
-  }
+    public Statement getSimpleCopy() {
 
-  // *****************************************************************************
-  // public methods
-  // *****************************************************************************
+        BasicBlock newblock = new BasicBlock(
+                DecompilerContext.getCounterContainer().getCounterAndIncrement(CounterContainer.STATEMENT_COUNTER));
 
-  public TextBuffer toJava(int indent, BytecodeMappingTracer tracer) {
-    return ExprProcessor.listToJava(varDefinitions, indent, tracer).append(ExprProcessor.listToJava(exprents, indent, tracer));
-  }
+        SimpleInstructionSequence seq = new SimpleInstructionSequence();
+        for (int i = 0; i < block.getSeq().length(); i++) {
+            seq.addInstruction(block.getSeq().getInstr(i).clone(), -1);
+        }
 
-  public Statement getSimpleCopy() {
+        newblock.setSeq(seq);
 
-    BasicBlock newblock = new BasicBlock(
-      DecompilerContext.getCounterContainer().getCounterAndIncrement(CounterContainer.STATEMENT_COUNTER));
-
-    SimpleInstructionSequence seq = new SimpleInstructionSequence();
-    for (int i = 0; i < block.getSeq().length(); i++) {
-      seq.addInstruction(block.getSeq().getInstr(i).clone(), -1);
+        return new BasicBlockStatement(newblock);
     }
 
-    newblock.setSeq(seq);
 
-    return new BasicBlockStatement(newblock);
-  }
+    // *****************************************************************************
+    // getter and setter methods
+    // *****************************************************************************
 
-
-  // *****************************************************************************
-  // getter and setter methods
-  // *****************************************************************************
-
-  public BasicBlock getBlock() {
-    return block;
-  }
+    public BasicBlock getBlock() {
+        return block;
+    }
 }

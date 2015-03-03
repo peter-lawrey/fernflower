@@ -24,77 +24,73 @@ import java.util.List;
 
 public class DataPoint {
 
-  private List<VarType> localVariables = new ArrayList<VarType>();
+    private List<VarType> localVariables = new ArrayList<VarType>();
 
-  private ListStack<VarType> stack = new ListStack<VarType>();
+    private ListStack<VarType> stack = new ListStack<VarType>();
 
+    public static DataPoint getInitialDataPoint(StructMethod mt) {
 
-  public void setVariable(int index, VarType value) {
-    if (index >= localVariables.size()) {
-      for (int i = localVariables.size(); i <= index; i++) {
-        localVariables.add(new VarType(CodeConstants.TYPE_NOTINITIALIZED));
-      }
+        DataPoint point = new DataPoint();
+
+        MethodDescriptor md = MethodDescriptor.parseDescriptor(mt.getDescriptor());
+
+        int k = 0;
+        if (!mt.hasModifier(CodeConstants.ACC_STATIC)) {
+            point.setVariable(k++, new VarType(CodeConstants.TYPE_OBJECT, 0, null));
+        }
+
+        for (int i = 0; i < md.params.length; i++) {
+            VarType var = md.params[i];
+
+            point.setVariable(k++, var);
+            if (var.stackSize == 2) {
+                point.setVariable(k++, new VarType(CodeConstants.TYPE_GROUP2EMPTY));
+            }
+        }
+
+        return point;
     }
 
-    localVariables.set(index, value);
-  }
+    public void setVariable(int index, VarType value) {
+        if (index >= localVariables.size()) {
+            for (int i = localVariables.size(); i <= index; i++) {
+                localVariables.add(new VarType(CodeConstants.TYPE_NOTINITIALIZED));
+            }
+        }
 
-  public VarType getVariable(int index) {
-    if (index < localVariables.size()) {
-      return localVariables.get(index);
-    }
-    else if (index < 0) {
-      throw new IndexOutOfBoundsException();
-    }
-    else {
-      return new VarType(CodeConstants.TYPE_NOTINITIALIZED);
-    }
-  }
-
-  public DataPoint copy() {
-    DataPoint point = new DataPoint();
-    point.setLocalVariables(new ArrayList<VarType>(localVariables));
-    point.setStack(stack.clone());
-    return point;
-  }
-
-  public static DataPoint getInitialDataPoint(StructMethod mt) {
-
-    DataPoint point = new DataPoint();
-
-    MethodDescriptor md = MethodDescriptor.parseDescriptor(mt.getDescriptor());
-
-    int k = 0;
-    if (!mt.hasModifier(CodeConstants.ACC_STATIC)) {
-      point.setVariable(k++, new VarType(CodeConstants.TYPE_OBJECT, 0, null));
+        localVariables.set(index, value);
     }
 
-    for (int i = 0; i < md.params.length; i++) {
-      VarType var = md.params[i];
-
-      point.setVariable(k++, var);
-      if (var.stackSize == 2) {
-        point.setVariable(k++, new VarType(CodeConstants.TYPE_GROUP2EMPTY));
-      }
+    public VarType getVariable(int index) {
+        if (index < localVariables.size()) {
+            return localVariables.get(index);
+        } else if (index < 0) {
+            throw new IndexOutOfBoundsException();
+        } else {
+            return new VarType(CodeConstants.TYPE_NOTINITIALIZED);
+        }
     }
 
-    return point;
-  }
+    public DataPoint copy() {
+        DataPoint point = new DataPoint();
+        point.setLocalVariables(new ArrayList<VarType>(localVariables));
+        point.setStack(stack.clone());
+        return point;
+    }
 
+    public List<VarType> getLocalVariables() {
+        return localVariables;
+    }
 
-  public List<VarType> getLocalVariables() {
-    return localVariables;
-  }
+    public void setLocalVariables(List<VarType> localVariables) {
+        this.localVariables = localVariables;
+    }
 
-  public void setLocalVariables(List<VarType> localVariables) {
-    this.localVariables = localVariables;
-  }
+    public ListStack<VarType> getStack() {
+        return stack;
+    }
 
-  public ListStack<VarType> getStack() {
-    return stack;
-  }
-
-  public void setStack(ListStack<VarType> stack) {
-    this.stack = stack;
-  }
+    public void setStack(ListStack<VarType> stack) {
+        this.stack = stack;
+    }
 }

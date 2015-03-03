@@ -17,43 +17,51 @@ package org.jetbrains.java.decompiler.main.extern;
 
 public abstract class IFernflowerLogger {
 
-  public enum Severity {
-    TRACE("TRACE: "), INFO("INFO:  "), WARN("WARN:  "), ERROR("ERROR: ");
+    private Severity severity = Severity.INFO;
 
-    public final String prefix;
-
-    Severity(String prefix) {
-      this.prefix = prefix;
+    public boolean accepts(Severity severity) {
+        return severity.ordinal() >= this.severity.ordinal();
     }
-  }
 
-  private Severity severity = Severity.INFO;
+    public void setSeverity(Severity severity) {
+        this.severity = severity;
+    }
 
-  public boolean accepts(Severity severity) {
-    return severity.ordinal() >= this.severity.ordinal();
-  }
+    public abstract void writeMessage(String message, Severity severity);
 
-  public void setSeverity(Severity severity) {
-    this.severity = severity;
-  }
+    public abstract void writeMessage(String message, Throwable t);
 
-  public abstract void writeMessage(String message, Severity severity);
+    public void startReadingClass(String className) {
+    }
 
-  public abstract void writeMessage(String message, Throwable t);
+    public void endReadingClass() {
+    }
 
-  public void startReadingClass(String className) { }
+    public void startClass(String className) {
+    }
 
-  public void endReadingClass() { }
+    public void endClass() {
+    }
 
-  public void startClass(String className) { }
+    public void startMethod(String methodName) {
+    }
 
-  public void endClass() { }
+    public void endMethod() {
+    }
 
-  public void startMethod(String methodName) { }
+    public void startWriteClass(String className) {
+    }
 
-  public void endMethod() { }
+    public void endWriteClass() {
+    }
 
-  public void startWriteClass(String className) { }
+    public enum Severity {
+        TRACE("TRACE: "), INFO("INFO:  "), WARN("WARN:  "), ERROR("ERROR: ");
 
-  public void endWriteClass() { }
+        public final String prefix;
+
+        Severity(String prefix) {
+            this.prefix = prefix;
+        }
+    }
 }

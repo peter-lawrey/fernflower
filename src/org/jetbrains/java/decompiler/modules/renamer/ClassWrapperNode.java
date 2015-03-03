@@ -22,34 +22,34 @@ import java.util.List;
 
 public class ClassWrapperNode {
 
-  private StructClass classStruct;
+    private StructClass classStruct;
 
-  private ClassWrapperNode superclass;
+    private ClassWrapperNode superclass;
 
-  private List<ClassWrapperNode> subclasses = new ArrayList<ClassWrapperNode>();
+    private List<ClassWrapperNode> subclasses = new ArrayList<ClassWrapperNode>();
 
-  public ClassWrapperNode(StructClass cl) {
-    this.classStruct = cl;
-  }
+    public ClassWrapperNode(StructClass cl) {
+        this.classStruct = cl;
+    }
 
-  public void addSubclass(ClassWrapperNode node) {
-    node.setSuperclass(this);
-    subclasses.add(node);
-  }
+    public void addSubclass(ClassWrapperNode node) {
+        node.setSuperclass(this);
+        subclasses.add(node);
+    }
 
-  public StructClass getClassStruct() {
-    return classStruct;
-  }
+    public StructClass getClassStruct() {
+        return classStruct;
+    }
 
-  public List<ClassWrapperNode> getSubclasses() {
-    return subclasses;
-  }
+    public List<ClassWrapperNode> getSubclasses() {
+        return subclasses;
+    }
 
-  public ClassWrapperNode getSuperclass() {
-    return superclass;
-  }
+    public ClassWrapperNode getSuperclass() {
+        return superclass;
+    }
 
-  public void setSuperclass(ClassWrapperNode superclass) {
-    this.superclass = superclass;
-  }
+    public void setSuperclass(ClassWrapperNode superclass) {
+        this.superclass = superclass;
+    }
 }

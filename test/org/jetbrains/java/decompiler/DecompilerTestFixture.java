@@ -27,73 +27,74 @@ import java.util.Map;
 import static org.junit.Assert.assertTrue;
 
 public class DecompilerTestFixture {
-  private File testDataDir;
-  private File tempDir;
-  private File targetDir;
-  private ConsoleDecompiler decompiler;
+    private File testDataDir;
+    private File tempDir;
+    private File targetDir;
+    private ConsoleDecompiler decompiler;
 
-  public void setUp() throws IOException {
-    setUp(Collections.<String, Object>emptyMap());
-  }
-
-  public void setUp(final Map<String, Object> options) throws IOException {
-    testDataDir = new File("testData");
-    if (!isTestDataDir(testDataDir)) testDataDir = new File("community/plugins/java-decompiler/engine/testData");
-    if (!isTestDataDir(testDataDir)) testDataDir = new File("plugins/java-decompiler/engine/testData");
-    if (!isTestDataDir(testDataDir)) testDataDir = new File("../community/plugins/java-decompiler/engine/testData");
-    if (!isTestDataDir(testDataDir)) testDataDir = new File("../plugins/java-decompiler/engine/testData");
-    assertTrue("current dir: " + new File("").getAbsolutePath(), isTestDataDir(testDataDir));
-
-    //noinspection SSBasedInspection
-    tempDir = File.createTempFile("decompiler_test_", "_dir");
-    assertTrue(tempDir.delete());
-
-    targetDir = new File(tempDir, "decompiled");
-    assertTrue(targetDir.mkdirs());
-    decompiler = new ConsoleDecompiler(this.targetDir, new HashMap<String, Object>() {{
-      put(IFernflowerPreferences.LOG_LEVEL, "warn");
-      put(IFernflowerPreferences.DECOMPILE_GENERIC_SIGNATURES, "1");
-      put(IFernflowerPreferences.REMOVE_SYNTHETIC, "1");
-      put(IFernflowerPreferences.REMOVE_BRIDGE, "1");
-      put(IFernflowerPreferences.LITERALS_AS_IS, "1");
-      put(IFernflowerPreferences.UNIT_TEST_MODE, "1");
-      putAll(options);
-    }});
-  }
-
-  public void tearDown() {
-    if (tempDir != null) {
-      delete(tempDir);
+    private static boolean isTestDataDir(File dir) {
+        return dir.isDirectory() && new File(dir, "classes").isDirectory() && new File(dir, "results").isDirectory();
     }
-  }
 
-  public File getTestDataDir() {
-    return testDataDir;
-  }
-
-  public File getTempDir() {
-    return tempDir;
-  }
-
-  public File getTargetDir() {
-    return targetDir;
-  }
-
-  public ConsoleDecompiler getDecompiler() {
-    return decompiler;
-  }
-
-  private static boolean isTestDataDir(File dir) {
-    return dir.isDirectory() && new File(dir, "classes").isDirectory() && new File(dir, "results").isDirectory();
-  }
-
-  private static void delete(File file) {
-    if (file.isDirectory()) {
-      File[] files = file.listFiles();
-      if (files != null) {
-        for (File f : files) delete(f);
-      }
+    private static void delete(File file) {
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (File f : files) delete(f);
+            }
+        }
+        if (file.exists())
+            assertTrue(file.delete());
     }
-    assertTrue(file.delete());
-  }
+
+    public void setUp() throws IOException {
+        setUp(Collections.<String, Object>emptyMap());
+    }
+
+    public void setUp(final Map<String, Object> options) throws IOException {
+        testDataDir = new File("testData");
+        if (!isTestDataDir(testDataDir)) testDataDir = new File("community/plugins/java-decompiler/engine/testData");
+        if (!isTestDataDir(testDataDir)) testDataDir = new File("plugins/java-decompiler/engine/testData");
+        if (!isTestDataDir(testDataDir)) testDataDir = new File("../community/plugins/java-decompiler/engine/testData");
+        if (!isTestDataDir(testDataDir)) testDataDir = new File("../plugins/java-decompiler/engine/testData");
+        assertTrue("current dir: " + new File("").getAbsolutePath(), isTestDataDir(testDataDir));
+
+        //noinspection SSBasedInspection
+        tempDir = File.createTempFile("decompiler_test_", "_dir");
+        assertTrue(tempDir.delete());
+
+        targetDir = new File(tempDir, "decompiled");
+        assertTrue(targetDir.mkdirs());
+        decompiler = new ConsoleDecompiler(this.targetDir, new HashMap<String, Object>() {{
+            put(IFernflowerPreferences.LOG_LEVEL, "warn");
+            put(IFernflowerPreferences.DECOMPILE_GENERIC_SIGNATURES, "1");
+            put(IFernflowerPreferences.REMOVE_SYNTHETIC, "1");
+            put(IFernflowerPreferences.REMOVE_BRIDGE, "1");
+            put(IFernflowerPreferences.LITERALS_AS_IS, "1");
+            put(IFernflowerPreferences.UNIT_TEST_MODE, "1");
+            putAll(options);
+        }});
+    }
+
+    public void tearDown() {
+        if (tempDir != null) {
+            delete(tempDir);
+        }
+    }
+
+    public File getTestDataDir() {
+        return testDataDir;
+    }
+
+    public File getTempDir() {
+        return tempDir;
+    }
+
+    public File getTargetDir() {
+        return targetDir;
+    }
+
+    public ConsoleDecompiler getDecompiler() {
+        return decompiler;
+    }
 }

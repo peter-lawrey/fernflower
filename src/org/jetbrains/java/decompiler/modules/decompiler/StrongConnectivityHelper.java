@@ -63,145 +63,144 @@ import java.util.List;
 
 public class StrongConnectivityHelper {
 
-  private ListStack<Statement> lstack;
+    private ListStack<Statement> lstack;
 
-  private int ncounter;
+    private int ncounter;
 
-  private HashSet<Statement> tset;
-  private HashMap<Statement, Integer> dfsnummap;
-  private HashMap<Statement, Integer> lowmap;
+    private HashSet<Statement> tset;
+    private HashMap<Statement, Integer> dfsnummap;
+    private HashMap<Statement, Integer> lowmap;
 
-  private List<List<Statement>> components;
+    private List<List<Statement>> components;
 
-  private HashSet<Statement> setProcessed;
+    private HashSet<Statement> setProcessed;
 
-  // *****************************************************************************
-  // constructors
-  // *****************************************************************************
+    // *****************************************************************************
+    // constructors
+    // *****************************************************************************
 
-  public StrongConnectivityHelper() {
-  }
-
-  public StrongConnectivityHelper(Statement stat) {
-    findComponents(stat);
-  }
-
-  // *****************************************************************************
-  // public methods
-  // *****************************************************************************
-
-  public List<List<Statement>> findComponents(Statement stat) {
-
-    components = new ArrayList<List<Statement>>();
-    setProcessed = new HashSet<Statement>();
-
-    visitTree(stat.getFirst());
-
-    for (Statement st : stat.getStats()) {
-      if (!setProcessed.contains(st) && st.getPredecessorEdges(Statement.STATEDGE_DIRECT_ALL).isEmpty()) {
-        visitTree(st);
-      }
+    public StrongConnectivityHelper() {
     }
 
-    // should not find any more nodes! FIXME: ??
-    for (Statement st : stat.getStats()) {
-      if (!setProcessed.contains(st)) {
-        visitTree(st);
-      }
+    public StrongConnectivityHelper(Statement stat) {
+        findComponents(stat);
     }
 
-    return components;
-  }
+    // *****************************************************************************
+    // public methods
+    // *****************************************************************************
 
-  public static boolean isExitComponent(List<Statement> lst) {
+    public static boolean isExitComponent(List<Statement> lst) {
 
-    HashSet<Statement> set = new HashSet<Statement>();
-    for (Statement stat : lst) {
-      set.addAll(stat.getNeighbours(StatEdge.TYPE_REGULAR, Statement.DIRECTION_FORWARD));
-    }
-    set.removeAll(lst);
+        HashSet<Statement> set = new HashSet<Statement>();
+        for (Statement stat : lst) {
+            set.addAll(stat.getNeighbours(StatEdge.TYPE_REGULAR, Statement.DIRECTION_FORWARD));
+        }
+        set.removeAll(lst);
 
-    return (set.size() == 0);
-  }
-
-  public static List<Statement> getExitReps(List<List<Statement>> lst) {
-
-    List<Statement> res = new ArrayList<Statement>();
-
-    for (List<Statement> comp : lst) {
-      if (isExitComponent(comp)) {
-        res.add(comp.get(0));
-      }
+        return (set.size() == 0);
     }
 
-    return res;
-  }
+    public static List<Statement> getExitReps(List<List<Statement>> lst) {
 
-  // *****************************************************************************
-  // private methods
-  // *****************************************************************************
+        List<Statement> res = new ArrayList<Statement>();
 
-  private void visitTree(Statement stat) {
-    lstack = new ListStack<Statement>();
-    ncounter = 0;
-    tset = new HashSet<Statement>();
-    dfsnummap = new HashMap<Statement, Integer>();
-    lowmap = new HashMap<Statement, Integer>();
+        for (List<Statement> comp : lst) {
+            if (isExitComponent(comp)) {
+                res.add(comp.get(0));
+            }
+        }
 
-    visit(stat);
+        return res;
+    }
 
-    setProcessed.addAll(tset);
-    setProcessed.add(stat);
-  }
+    public List<List<Statement>> findComponents(Statement stat) {
 
-  private void visit(Statement stat) {
+        components = new ArrayList<List<Statement>>();
+        setProcessed = new HashSet<Statement>();
 
-    lstack.push(stat);
-    dfsnummap.put(stat, ncounter);
-    lowmap.put(stat, ncounter);
-    ncounter++;
+        visitTree(stat.getFirst());
 
-    List<Statement> lstSuccs = stat.getNeighbours(StatEdge.TYPE_REGULAR, Statement.DIRECTION_FORWARD); // TODO: set?
-    lstSuccs.removeAll(setProcessed);
+        for (Statement st : stat.getStats()) {
+            if (!setProcessed.contains(st) && st.getPredecessorEdges(Statement.STATEDGE_DIRECT_ALL).isEmpty()) {
+                visitTree(st);
+            }
+        }
 
-    for (int i = 0; i < lstSuccs.size(); i++) {
-      Statement succ = lstSuccs.get(i);
-      int secvalue;
+        // should not find any more nodes! FIXME: ??
+        for (Statement st : stat.getStats()) {
+            if (!setProcessed.contains(st)) {
+                visitTree(st);
+            }
+        }
 
-      if (tset.contains(succ)) {
-        secvalue = dfsnummap.get(succ);
-      }
-      else {
-        tset.add(succ);
-        visit(succ);
-        secvalue = lowmap.get(succ);
-      }
-      lowmap.put(stat, Math.min(lowmap.get(stat), secvalue));
+        return components;
+    }
+
+    // *****************************************************************************
+    // private methods
+    // *****************************************************************************
+
+    private void visitTree(Statement stat) {
+        lstack = new ListStack<Statement>();
+        ncounter = 0;
+        tset = new HashSet<Statement>();
+        dfsnummap = new HashMap<Statement, Integer>();
+        lowmap = new HashMap<Statement, Integer>();
+
+        visit(stat);
+
+        setProcessed.addAll(tset);
+        setProcessed.add(stat);
+    }
+
+    private void visit(Statement stat) {
+
+        lstack.push(stat);
+        dfsnummap.put(stat, ncounter);
+        lowmap.put(stat, ncounter);
+        ncounter++;
+
+        List<Statement> lstSuccs = stat.getNeighbours(StatEdge.TYPE_REGULAR, Statement.DIRECTION_FORWARD); // TODO: set?
+        lstSuccs.removeAll(setProcessed);
+
+        for (int i = 0; i < lstSuccs.size(); i++) {
+            Statement succ = lstSuccs.get(i);
+            int secvalue;
+
+            if (tset.contains(succ)) {
+                secvalue = dfsnummap.get(succ);
+            } else {
+                tset.add(succ);
+                visit(succ);
+                secvalue = lowmap.get(succ);
+            }
+            lowmap.put(stat, Math.min(lowmap.get(stat), secvalue));
+        }
+
+
+        if (lowmap.get(stat).intValue() == dfsnummap.get(stat).intValue()) {
+            List<Statement> lst = new ArrayList<Statement>();
+            Statement v;
+            do {
+                v = lstack.pop();
+                lst.add(v);
+            }
+            while (v != stat);
+            components.add(lst);
+        }
     }
 
 
-    if (lowmap.get(stat).intValue() == dfsnummap.get(stat).intValue()) {
-      List<Statement> lst = new ArrayList<Statement>();
-      Statement v;
-      do {
-        v = lstack.pop();
-        lst.add(v);
-      }
-      while (v != stat);
-      components.add(lst);
+    // *****************************************************************************
+    // getter and setter methods
+    // *****************************************************************************
+
+    public List<List<Statement>> getComponents() {
+        return components;
     }
-  }
 
-
-  // *****************************************************************************
-  // getter and setter methods
-  // *****************************************************************************
-
-  public List<List<Statement>> getComponents() {
-    return components;
-  }
-
-  public void setComponents(List<List<Statement>> components) {
-    this.components = components;
-  }
+    public void setComponents(List<List<Statement>> components) {
+        this.components = components;
+    }
 }

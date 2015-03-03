@@ -25,56 +25,56 @@ import java.util.Set;
 
 public class VarVersionNode implements IGraphNode {
 
-  public static final int FLAG_PHANTOM_FINEXIT = 2;
+    public static final int FLAG_PHANTOM_FINEXIT = 2;
 
-  public int var;
+    public int var;
 
-  public int version;
+    public int version;
 
-  public Set<VarVersionEdge> succs = new HashSet<VarVersionEdge>();
+    public Set<VarVersionEdge> succs = new HashSet<VarVersionEdge>();
 
-  public Set<VarVersionEdge> preds = new HashSet<VarVersionEdge>();
+    public Set<VarVersionEdge> preds = new HashSet<VarVersionEdge>();
 
-  public int flags;
+    public int flags;
 
-  public SFormsFastMapDirect live = new SFormsFastMapDirect();
+    public SFormsFastMapDirect live = new SFormsFastMapDirect();
 
 
-  public VarVersionNode(int var, int version) {
-    this.var = var;
-    this.version = version;
-  }
-
-  public VarVersionPair getVarPaar() {
-    return new VarVersionPair(var, version);
-  }
-
-  public List<IGraphNode> getPredecessors() {
-    List<IGraphNode> lst = new ArrayList<IGraphNode>(preds.size());
-    for (VarVersionEdge edge : preds) {
-      lst.add(edge.source);
+    public VarVersionNode(int var, int version) {
+        this.var = var;
+        this.version = version;
     }
-    return lst;
-  }
 
-  public void removeSuccessor(VarVersionEdge edge) {
-    succs.remove(edge);
-  }
+    public VarVersionPair getVarPaar() {
+        return new VarVersionPair(var, version);
+    }
 
-  public void removePredecessor(VarVersionEdge edge) {
-    preds.remove(edge);
-  }
+    public List<IGraphNode> getPredecessors() {
+        List<IGraphNode> lst = new ArrayList<IGraphNode>(preds.size());
+        for (VarVersionEdge edge : preds) {
+            lst.add(edge.source);
+        }
+        return lst;
+    }
 
-  public void addSuccessor(VarVersionEdge edge) {
-    succs.add(edge);
-  }
+    public void removeSuccessor(VarVersionEdge edge) {
+        succs.remove(edge);
+    }
 
-  public void addPredecessor(VarVersionEdge edge) {
-    preds.add(edge);
-  }
+    public void removePredecessor(VarVersionEdge edge) {
+        preds.remove(edge);
+    }
 
-  @Override
-  public String toString() {
-    return "(" + var + "_" + version + ")";
-  }
+    public void addSuccessor(VarVersionEdge edge) {
+        succs.add(edge);
+    }
+
+    public void addPredecessor(VarVersionEdge edge) {
+        preds.add(edge);
+    }
+
+    @Override
+    public String toString() {
+        return "(" + var + "_" + version + ")";
+    }
 }

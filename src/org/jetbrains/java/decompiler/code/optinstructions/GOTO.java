@@ -22,25 +22,23 @@ import java.io.IOException;
 
 public class GOTO extends JumpInstruction {
 
-  public void writeToStream(DataOutputStream out, int offset) throws IOException {
-    int operand = getOperand(0);
-    if (operand < -32768 || operand > 32767) {
-      out.writeByte(opc_goto_w);
-      out.writeInt(operand);
+    public void writeToStream(DataOutputStream out, int offset) throws IOException {
+        int operand = getOperand(0);
+        if (operand < -32768 || operand > 32767) {
+            out.writeByte(opc_goto_w);
+            out.writeInt(operand);
+        } else {
+            out.writeByte(opc_goto);
+            out.writeShort(operand);
+        }
     }
-    else {
-      out.writeByte(opc_goto);
-      out.writeShort(operand);
-    }
-  }
 
-  public int length() {
-    int operand = getOperand(0);
-    if (operand < -32768 || operand > 32767) {
-      return 5;
+    public int length() {
+        int operand = getOperand(0);
+        if (operand < -32768 || operand > 32767) {
+            return 5;
+        } else {
+            return 3;
+        }
     }
-    else {
-      return 3;
-    }
-  }
 }
